@@ -4,7 +4,7 @@ type Message = { id: string; text: string; sender: 'user' | 'bot' };
 
 const ChatBox: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -15,56 +15,60 @@ const ChatBox: React.FC = () => {
   }, [messages]);
 
   const sendMessage = async () => {
-  const text = input.trim();
-  if (!text || isStreaming) return;
+    const text = input.trim();
+    if (!text || isStreaming) return;
 
-  // Agregar mensaje del usuario
-  const userMsg: Message = {
-    id: Date.now().toString(),
-    text,
-    sender: 'user',
-  };
-  setMessages(prev => [...prev, userMsg]);
-  setInput('');
-  setError(null);
-  setIsStreaming(true);
+    // Agregar mensaje del usuario
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      text,
+      sender: 'user',
+    };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+    setError(null);
+    setIsStreaming(true);
 
-  // Crear un mensaje temporal para el bot (vacío)
-  const botMsgId = (Date.now() + 1).toString();
-  setMessages(prev => [...prev, { id: botMsgId, text: '', sender: 'bot' }]);
+    // Crear un mensaje temporal para el bot (vacío)
+    const botMsgId = (Date.now() + 1).toString();
+    setMessages(prev => [...prev, { id: botMsgId, text: '', sender: 'bot' }]);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-  // Conectar al endpoint SSE
-  const encodedMsg = encodeURIComponent(text);
-  const eventSource = new EventSource(`${API_URL}/chat/stream?message=${encodedMsg}`);
+    let streamCompleted = false;
 
-  let accumulated = '';
+    // Conectar al endpoint SSE
+    const encodedMsg = encodeURIComponent(text);
+    const eventSource = new EventSource(`${API_URL}/chat/stream?message=${encodedMsg}`);
 
-  eventSource.onmessage = (event) => {
-    accumulated += event.data;
-    setMessages(prev =>
-      prev.map(msg =>
-        msg.id === botMsgId ? { ...msg, text: accumulated } : msg
-      )
-    );
-  };
+    let accumulated = '';
 
-  eventSource.onerror = () => {
-    if (eventSource.readyState === EventSource.CLOSED) {
-      // Conexión cerrada correctamente por el servidor
-      setIsStreaming(false);
-      inputRef.current?.focus();
+    eventSource.onmessage = (event) => {
+      streamCompleted = true;
+      accumulated += event.data;
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === botMsgId ? { ...msg, text: accumulated } : msg
+        )
+      );
+    };
+
+    eventSource.onerror = () => {
+      if (streamCompleted) {
+        // El stream terminó normalmente
+        console.log("Stream finalizado correctamente");
+        setIsStreaming(false);
+        inputRef.current?.focus();
+        eventSource.close();
+        return;
+      }
+      // No se recibió ningún dato: error real
+      console.error("Error real en SSE");
+      setError("Connection lost. Please try again.");
       eventSource.close();
-      return;
-    }
-    // Error real (problema de red, servidor caído, etc.)
-    console.error('SSE error', eventSource);
-    setError('Connection lost. Please try again.');
-    eventSource.close();
-    setIsStreaming(false);
+      setIsStreaming(false);
+    };
   };
-};
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !isStreaming) {
@@ -77,7 +81,7 @@ const ChatBox: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 600, margin: '20px auto', fontFamily: 'sans-serif', border: '1px solid #ccc', borderRadius: 8, overflow: 'hidden' }}>
-      <div style={{ background: '#f0f0f0', padding: 12, fontWeight: 'bold' }}>🤖 Chat con Groq (Streaming)</div>
+      <div style={{ background: '#f0f0f0', padding: 12, fontWeight: 'bold' }}>Chat con Groq (Streaming)</div>
       <div style={{ height: 400, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {messages.map((m) => (
           <div

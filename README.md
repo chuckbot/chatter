@@ -27,7 +27,11 @@ GROQ_TEMPERATURE=0.7
 GROQ_MAX_TOKENS=300
 ```
 
-El frontend usará `http://localhost:3000` por defecto. Si quieres cambiarlo, añade `VITE_API_URL` en `frontend/.env`.
+El frontend usará `http://localhost:3000` por defecto. Si quieres cambiarlo, añade `VITE_API_URL` en `frontend/.env`:
+
+```bash
+VITE_API_URL=http://localhost:3000
+```
 
 ## Ejecución en desarrollo (local)
 
