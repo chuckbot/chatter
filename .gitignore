@@ -1,0 +1,31 @@
+# Dependencies
+**/node_modules/
+**/.pnp/
+**/.pnp.js
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+
+# Environment variables (archivos con claves)
+**/.env
+**/.env.local
+**/.env.*.local
+**/.env.example
+
+# Logs
+**/logs/
+**/*.log
+**/npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker (ignorar archivos específicos si los hay)
+**/docker-compose.override.yml
