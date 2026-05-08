@@ -92,8 +92,6 @@ Preguntas fuera de dominio reciben un aviso cortés de redirección.
 | Problema | Solución |
 | :--- | :--- |
 | `Missing GROQ_API_KEY` | Verifica que el archivo `.env` esté en `backend/` y que la clave sea correcta. |
-| `Cannot find module '/app/dist/main.js'` | Ejecuta `npm run build` localmente y asegura que `tsconfig.json` tenga `"outDir": "./dist"` y `"rootDir": "./src"`. |
-| SSE error en consola del navegador | Es un falso positivo. El `EventSource` dispara `onerror` al cerrar la conexión. Aplica la corrección sugerida en el código o ignóralo porque el chat funciona. |
 | El frontend no ve al backend en Docker | Verifica que en `frontend/.env` (o en el `docker-compose.yml`) `VITE_API_URL` apunte a `http://backend:3000`. |
 
 ## Tecnologías utilizadas
