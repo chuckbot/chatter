@@ -20,10 +20,12 @@ Aplicación de chat que usa **Groq** (LLM) con **streaming de tokens**, **rate l
 
 Crea un archivo `.env` dentro de `backend/` con:
 
+```bash
 GROQ_API_KEY=tu_clave_aqui
 GROQ_MODEL=llama-3.3-70b-versatile
 GROQ_TEMPERATURE=0.7
 GROQ_MAX_TOKENS=300
+```
 
 El frontend usará `http://localhost:3000` por defecto. Si quieres cambiarlo, añade `VITE_API_URL` en `frontend/.env`.
 
